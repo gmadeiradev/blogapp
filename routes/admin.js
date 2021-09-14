@@ -17,16 +17,35 @@ router.get("/categories", (req, res) => {
 });
 
 router.post("/categories/new", (req, res) => {
-    const newCategory = {
-        name: req.body.name,
-        slug: req.body.slug
+    let error = [];
+
+    if (!req.body.name || typeof req.body.name == undefined || req.body.name == null) {
+        error.push({ text: "Invalid Name!" });
     }
 
-    new Category(newCategory).save().then(() => {
-        console.log("Successfully created category");
-    }).catch((err) => {
-        console.log("Error trying to create category "+err);
-    });
+    if (!req.body.slug || typeof req.body.slug == undefined || req.body.slug == null) {
+        error.push({ text: "Invalid Slug" });
+    }
+
+    if (req.body.name.length < 2) {
+        error.push({ text: "Category Name too small!" });
+    }
+
+    if (error.length > 0) {
+        res.render("admin/addcategories", { error: error });
+    } else {
+        const newCategory = {
+            name: req.body.name,
+            slug: req.body.slug
+        }
+        new Category(newCategory).save().then(() => {
+            req.flash("success_msg", "Successfully created category!");
+            res.redirect("/admin/categories");
+        }).catch((err) => {
+            req.flash("error_msg", "Error trying to create category! Please try again.");
+            res.redirect("/admin");
+        });
+    }
 });
 
 router.get("/categories/add", (req, res) => {
