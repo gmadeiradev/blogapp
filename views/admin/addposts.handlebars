@@ -1,7 +1,12 @@
+{{#each error}}
+<div class="alert alert-danger">
+    {{text}}
+</div>
+{{/each}}
 <h3>New Post</h3>
 <div class="card">
     <div class="card-body">
-        <form action="" method="POST">
+        <form action="/admin/posts/new" method="POST">
             <label for="title">Title</label>
             <input type="text" name="title" class="form-control">
             <label for="slug">Slug</label>

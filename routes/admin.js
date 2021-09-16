@@ -3,6 +3,8 @@ const router = express.Router();
 const mongoose = require("mongoose");
 require("../models/Category");
 const Category = mongoose.model("categories");
+require("../models/Post");
+const Post = mongoose.model("posts");
 
 // index page
 router.get("/", (req, res) => {
@@ -107,6 +109,33 @@ router.get("/posts/add", (req, res) => {
         console.log(err);
         res.redirect("/admin");
     });
+});
+// new post
+router.post("/posts/new", (req, res) => {
+    let error = [];
+
+    if (req.body.category === "0") {
+        error.push({ text: "Invalid category. Register a category." });
+    }
+    if (error.length > 0) {
+        res.render("admin/addposts", { error: error });
+    } else {
+        const newPost = {
+            title: req.body.title,
+            description: req.body.description,
+            content: req.body.content,
+            category: req.body.category,
+            slug: req.body.slug
+        }
+        new Post(newPost).save().then(() => {
+            req.flash("success_msg", "Successfully created post!");
+            res.redirect("/admin/posts");
+        }).catch((err) => {
+            req.flash("error_msg", "There was an error to create the post!")
+            console.log(err);
+            res.redirect("/admin/posts");
+        })
+    }
 });
 
 module.exports = router;
