@@ -11,7 +11,7 @@ router.get("/", (req, res) => {
 router.get("/posts", (req, res) => {
     res.send("Posts page");
 });
- // categories list
+// categories list
 router.get("/categories", (req, res) => {
     Category.find().lean().sort({ date: "desc" }).then((categories) => {
         res.render("admin/categories", { categories: categories });
@@ -40,7 +40,7 @@ router.post("/categories/new", (req, res) => {
         const newCategory = {
             name: req.body.name,
             slug: req.body.slug
-        }
+        };
         new Category(newCategory).save().then(() => {
             req.flash("success_msg", "Successfully created category!");
             res.redirect("/admin/categories");
@@ -51,7 +51,7 @@ router.post("/categories/new", (req, res) => {
         });
     }
 });
-
+// show categories by id
 router.get("/categories/edit/:id", (req, res) => {
     Category.findOne({ _id: req.params.id }).lean().then((category) => {
         res.render("admin/editcategories", { category: category });
@@ -61,7 +61,7 @@ router.get("/categories/edit/:id", (req, res) => {
         res.redirect("/admin/categories");
     });
 });
-
+// edit categories
 router.post("/categories/edit", (req, res) => {
     Category.findOne({ _id: req.body.id }).then((category) => {
         //
@@ -75,14 +75,25 @@ router.post("/categories/edit", (req, res) => {
             req.flash("error_msg", "Error trying to edit category");
             console.log(err);
             res.redirect("/admin/categories");
-        })
+        });
     }).catch((err) => {
         req.flash("error_msg", "There was an error editing the category!");
         console.log(err);
         res.redirect("/admin/categories");
-    })
+    });
 });
-
+// delete category
+router.post("/categories/delete", (req, res) => {
+    Category.remove({ _id: req.body.id }).then(() => {
+        req.flash("success_msg", "Successfully deleted category!")
+        res.redirect("/admin/categories");
+    }).catch((err) => {
+        req.flash("error_msg", "There was an error deleting the category!");
+        console.log(err);
+        res.redirect("/admin/categories");
+    });
+});
+// add category
 router.get("/categories/add", (req, res) => {
     res.render("admin/addcategories");
 });
