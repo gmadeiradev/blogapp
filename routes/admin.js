@@ -4,12 +4,9 @@ const mongoose = require("mongoose");
 require("../models/Category");
 const Category = mongoose.model("categories");
 
+// index page
 router.get("/", (req, res) => {
     res.render("admin/index");
-});
-// posts page
-router.get("/posts", (req, res) => {
-    res.send("Posts page");
 });
 // categories list
 router.get("/categories", (req, res) => {
@@ -96,6 +93,20 @@ router.post("/categories/delete", (req, res) => {
 // add category
 router.get("/categories/add", (req, res) => {
     res.render("admin/addcategories");
+});
+// posts page
+router.get("/posts", (req, res) => {
+    res.render("admin/posts");
+});
+// add posts
+router.get("/posts/add", (req, res) => {
+    Category.find().lean().then((categories) => {
+        res.render("admin/addposts", { categories: categories });
+    }).catch((err) => {
+        req.flash("error_msg", "There was an error loading the form!");
+        console.log(err);
+        res.redirect("/admin");
+    });
 });
 
 module.exports = router;
