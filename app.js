@@ -53,7 +53,7 @@ app.use((req, res, next) => {
 
 // * routes
 app.get("/", (req, res) => {
-    Post.find().populate("category").sort({ date: "desc" }).then((posts) => {
+    Post.find().lean().populate("category").sort({ date: "desc" }).then((posts) => {
         res.render("index", { posts: posts });
     }).catch((err) => {
         req.flash("error_msg", "There was an internal error!");
@@ -61,6 +61,21 @@ app.get("/", (req, res) => {
         res.redirect("/404");
     })
 });
+
+app.get("/post/:slug", (req, res) => {
+    Post.findOne({ slug: req.params.slug }).lean().then((post) => {
+        if (post) {
+            res.render("post/index", { post: post });
+        } else {
+            req.flash("error_msg", "This post doesn't exists.");
+            res.redirect("/");
+        }
+    }).catch((err) => {
+        req.flash("error_msg", "There was an internal error!");
+        console.log(err);
+        res.redirect("/");
+    })
+})
 
 app.get("/404", (req, res) => {
     res.send("ERROR 404!");

@@ -1,22 +1,30 @@
 <div class="jumbotron">
-  <h1 class="display-4">Bem vindo, ao Blog App!</h1>
-  <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
-  <hr class="my-4">
-  <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
-  <p class="lead">
-    <a class="btn btn-primary btn-lg" href="#" role="button">Create an accont</a>
-  </p>
+    <h1 class="display-4">Welcome to Blog App!</h1>
+    <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to
+        featured content or information.</p>
+    <hr class="my-4">
+    <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
+    <p class="lead">
+        <a class="btn btn-primary btn-lg" href="#" role="button">Create an accont</a>
+    </p>
 </div>
 <hr />
 <h2>Recently Posts</h2>
 
 {{#each posts}}
-<div class="card">
+<div class="card mt-3">
     <div class="card-body">
         <h3>{{title}}</h3>
         <p>
             {{description}}
         </p>
+        <a href="/post/{{slug}}">
+            <button class="btn btn-success">Read More</button>
+        </a>
+        <hr />
+        <small>Category: {{category.name}}</small>
+        <br />
+        <small>Publishe in: {{date}}</small>
     </div>
 </div>
 {{else}}
