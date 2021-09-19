@@ -9,6 +9,8 @@ const session = require("express-session");
 const flash = require("connect-flash");
 require("./models/Post");
 const Post = mongoose.model("posts");
+require("./models/Category");
+const Category = mongoose.model("categories");
 
 // * configs
 //session
@@ -74,8 +76,39 @@ app.get("/post/:slug", (req, res) => {
         req.flash("error_msg", "There was an internal error!");
         console.log(err);
         res.redirect("/");
-    })
-})
+    });
+});
+
+app.get("/categories", (req, res) => {
+    Category.find().lean().then((categories) => {
+        res.render("categories/index", { categories: categories });
+    }).catch((err) => {
+        req.flash("error_msg", "There was an error trying to list categories!");
+        console.log(err);
+        res.redirect("/");
+    });
+});
+
+app.get("/categories/:slug", (req, res) => {
+    Category.findOne({ slug: req.params.slug }).lean().then((category) => {
+        if (category) {
+            Post.find({ category: category._id }).lean().then((posts) => {
+                res.render("categories/posts", { posts: posts, category: category });
+            }).catch((err) => {
+                req.flash("error_msg", "There was an error trying to list the posts.");
+                console.log(err);
+                res.redirect("/");
+            });
+        } else {
+            req.flash("error_msg", "This category doesn't exists.");
+            res.redirect("/");
+        }
+    }).catch((err) => {
+        req.flash("error_msg", "An error occurred while trying to access this category's page!");
+        console.log(err);
+        res.redirect("/");
+    });
+});
 
 app.get("/404", (req, res) => {
     res.send("ERROR 404!");
