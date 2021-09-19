@@ -98,7 +98,13 @@ router.get("/categories/add", (req, res) => {
 });
 // posts page
 router.get("/posts", (req, res) => {
-    res.render("admin/posts");
+    Post.find().lean().populate("category").sort({ data: "desc" }).then((posts) => {
+        res.render("admin/posts", { posts: posts });
+    }).catch((err) => {
+        req.flash("error_msg", "There was an error trying to list the posts!");
+        console.log(err);
+        res.redirect("/admin");
+    });
 });
 // add posts
 router.get("/posts/add", (req, res) => {
