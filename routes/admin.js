@@ -10,6 +10,7 @@ const Post = mongoose.model("posts");
 router.get("/", (req, res) => {
     res.render("admin/index");
 });
+
 // categories list
 router.get("/categories", (req, res) => {
     Category.find().lean().sort({ date: "desc" }).then((categories) => {
@@ -20,6 +21,7 @@ router.get("/categories", (req, res) => {
         res.redirect("/admin");
     });
 });
+
 // new category
 router.post("/categories/new", (req, res) => {
     let error = [];
@@ -50,6 +52,7 @@ router.post("/categories/new", (req, res) => {
         });
     }
 });
+
 // show categories by id
 router.get("/categories/edit/:id", (req, res) => {
     Category.findOne({ _id: req.params.id }).lean().then((category) => {
@@ -60,6 +63,7 @@ router.get("/categories/edit/:id", (req, res) => {
         res.redirect("/admin/categories");
     });
 });
+
 // edit categories (and display them)
 router.post("/categories/edit", (req, res) => {
     Category.findOne({ _id: req.body.id }).then((category) => {
@@ -81,6 +85,7 @@ router.post("/categories/edit", (req, res) => {
         res.redirect("/admin/categories");
     });
 });
+
 // delete category
 router.post("/categories/delete", (req, res) => {
     Category.remove({ _id: req.body.id }).then(() => {
@@ -92,10 +97,12 @@ router.post("/categories/delete", (req, res) => {
         res.redirect("/admin/categories");
     });
 });
+
 // add category
 router.get("/categories/add", (req, res) => {
     res.render("admin/addcategories");
 });
+
 // posts page
 router.get("/posts", (req, res) => {
     Post.find().lean().populate("category").sort({ data: "desc" }).then((posts) => {
@@ -106,6 +113,7 @@ router.get("/posts", (req, res) => {
         res.redirect("/admin");
     });
 });
+
 // add posts
 router.get("/posts/add", (req, res) => {
     Category.find().lean().then((categories) => {
@@ -116,6 +124,7 @@ router.get("/posts/add", (req, res) => {
         res.redirect("/admin");
     });
 });
+
 // new post
 router.post("/posts/new", (req, res) => {
     let error = [];
@@ -143,7 +152,8 @@ router.post("/posts/new", (req, res) => {
         });
     }
 });
-// edit posts (and display them)
+
+// display posts to edit
 router.get("/posts/edit/:id", (req, res) => {
     Post.findOne({ _id: req.params.id }).lean().then((post) => {
         Category.find().lean().then((categories) => {
@@ -160,6 +170,7 @@ router.get("/posts/edit/:id", (req, res) => {
     });
 });
 
+// edit posts
 router.post("/post/edit", (req, res) => {
     Post.findOne({ _id: req.body.id }).then((post) => {
         //
@@ -179,6 +190,18 @@ router.post("/post/edit", (req, res) => {
         });
     }).catch((err) => {
         req.flash("error_msg", "There was an error trying to save the update!");
+        console.log(err);
+        res.redirect("/admin/posts");
+    });
+});
+
+// delete post
+router.get("/posts/delete/:id", (req, res) => {
+    Post.remove({ _id: req.params.id }).then(() => {
+        req.flash("success_msg", "Successfully deleted post !")
+        res.redirect("/admin/posts");
+    }).catch((err) => {
+        req.flash("error_msg", "There was an internal error!");
         console.log(err);
         res.redirect("/admin/posts");
     });
