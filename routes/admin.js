@@ -60,7 +60,7 @@ router.get("/categories/edit/:id", (req, res) => {
         res.redirect("/admin/categories");
     });
 });
-// edit categories
+// edit categories (and display them)
 router.post("/categories/edit", (req, res) => {
     Category.findOne({ _id: req.body.id }).then((category) => {
         //
@@ -140,8 +140,48 @@ router.post("/posts/new", (req, res) => {
             req.flash("error_msg", "There was an error to create the post!")
             console.log(err);
             res.redirect("/admin/posts");
-        })
+        });
     }
+});
+// edit posts (and display them)
+router.get("/posts/edit/:id", (req, res) => {
+    Post.findOne({ _id: req.params.id }).lean().then((post) => {
+        Category.find().lean().then((categories) => {
+            res.render("admin/editposts", { categories: categories, post: post });
+        }).catch((err) => {
+            req.flash("error_msg", "There was an error to list the categories!");
+            console.log(err);
+            res.redirect("/admin/posts");
+        });
+    }).catch((err) => {
+        req.flash("error_msg", "There was an error to load the edition form!")
+        console.log(err);
+        res.redirect("/admin/posts");
+    });
+});
+
+router.post("/post/edit", (req, res) => {
+    Post.findOne({ _id: req.body.id }).then((post) => {
+        //
+        post.title = req.body.title;
+        post.slug = req.body.slug;
+        post.description = req.body.description;
+        post.content = req.body.content;
+        post.category = req.body.category;
+
+        post.save().then(() => {
+            req.flash("success_msg", "Successfully updated post!");
+            res.redirect("/admin/posts");
+        }).catch((err) => {
+            req.flash("error_msg", "There was an error trying to update!");
+            console.log(err);
+            res.redirect("/admin/posts");
+        });
+    }).catch((err) => {
+        req.flash("error_msg", "There was an error trying to save the update!");
+        console.log(err);
+        res.redirect("/admin/posts");
+    });
 });
 
 module.exports = router;
