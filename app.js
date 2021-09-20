@@ -14,6 +14,7 @@ const Category = mongoose.model("categories");
 const users = require("./routes/user");
 const passport = require("passport");
 require("./config/auth")(passport);
+const db = require("./config/db")
 
 // * configs
 //session
@@ -48,7 +49,7 @@ app.set("view engine", "handlebars");
 
 // mongoose
 mongoose.Promise = global.Promise;
-mongoose.connect("mongodb://localhost/blogapp").then(() => {
+mongoose.connect(db.mongoURI).then(() => {
     console.log("MongoDB connected :D");
 }).catch((err) => {
     console.log("Error trying to connect to MongoDB :( " + err);
@@ -127,7 +128,7 @@ app.get("/404", (req, res) => {
 app.use("/admin", admin);
 app.use("/users", users);
 
-const PORT = 8081;
+const PORT = process.env.PORT || 8081;
 app.listen(PORT, () => {
     console.log("Server ON!");
 });
