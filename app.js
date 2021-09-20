@@ -12,6 +12,8 @@ const Post = mongoose.model("posts");
 require("./models/Category");
 const Category = mongoose.model("categories");
 const users = require("./routes/user");
+const passport = require("passport");
+require("./config/auth")(passport);
 
 // * configs
 //session
@@ -21,23 +23,28 @@ app.use(session({
     saveUninitialized: true
 }));
 
+// passport
+app.use(passport.initialize());
+app.use(passport.session());
+
 // flash messages
 app.use(flash());
 app.use((req, res, next) => {
     res.locals.success_msg = req.flash("success_msg");
     res.locals.error_msg = req.flash("error_msg");
+    res.locals.error = req.flash("error");
     next();
 });
 
 // express
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-//hablebars
 
+//hablebars
 app.engine("handlebars", handlebars({ defaultLayout: "main" }))
 app.set("view engine", "handlebars");
-// mongoose
 
+// mongoose
 mongoose.Promise = global.Promise;
 mongoose.connect("mongodb://localhost/blogapp").then(() => {
     console.log("MongoDB connected :D");
