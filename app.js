@@ -11,6 +11,7 @@ require("./models/Post");
 const Post = mongoose.model("posts");
 require("./models/Category");
 const Category = mongoose.model("categories");
+const users = require("./routes/user");
 
 // * configs
 //session
@@ -115,6 +116,7 @@ app.get("/404", (req, res) => {
 });
 
 app.use("/admin", admin);
+app.use("/users", users);
 
 const PORT = 8081;
 app.listen(PORT, () => {
