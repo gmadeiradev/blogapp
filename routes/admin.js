@@ -5,14 +5,15 @@ require("../models/Category");
 const Category = mongoose.model("categories");
 require("../models/Post");
 const Post = mongoose.model("posts");
+const { isAdmin } = require("../helpers/isAdmin");
 
 // index page
-router.get("/", (req, res) => {
+router.get("/", isAdmin, (req, res) => {
     res.render("admin/index");
 });
 
 // categories list
-router.get("/categories", (req, res) => {
+router.get("/categories", isAdmin, (req, res) => {
     Category.find().lean().sort({ date: "desc" }).then((categories) => {
         res.render("admin/categories", { categories: categories });
     }).catch((err) => {
@@ -23,7 +24,7 @@ router.get("/categories", (req, res) => {
 });
 
 // new category
-router.post("/categories/new", (req, res) => {
+router.post("/categories/new", isAdmin, (req, res) => {
     let error = [];
 
     if (!req.body.name || typeof req.body.name == undefined || req.body.name == null) {
@@ -54,7 +55,7 @@ router.post("/categories/new", (req, res) => {
 });
 
 // show categories by id
-router.get("/categories/edit/:id", (req, res) => {
+router.get("/categories/edit/:id", isAdmin, (req, res) => {
     Category.findOne({ _id: req.params.id }).lean().then((category) => {
         res.render("admin/editcategories", { category: category });
     }).catch((err) => {
@@ -65,7 +66,7 @@ router.get("/categories/edit/:id", (req, res) => {
 });
 
 // edit categories (and display them)
-router.post("/categories/edit", (req, res) => {
+router.post("/categories/edit", isAdmin, (req, res) => {
     Category.findOne({ _id: req.body.id }).then((category) => {
         //
         category.name = req.body.name;
@@ -87,7 +88,7 @@ router.post("/categories/edit", (req, res) => {
 });
 
 // delete category
-router.post("/categories/delete", (req, res) => {
+router.post("/categories/delete", isAdmin, (req, res) => {
     Category.remove({ _id: req.body.id }).then(() => {
         req.flash("success_msg", "Successfully deleted category!")
         res.redirect("/admin/categories");
@@ -99,12 +100,12 @@ router.post("/categories/delete", (req, res) => {
 });
 
 // add category
-router.get("/categories/add", (req, res) => {
+router.get("/categories/add", isAdmin, (req, res) => {
     res.render("admin/addcategories");
 });
 
 // posts page
-router.get("/posts", (req, res) => {
+router.get("/posts", isAdmin, (req, res) => {
     Post.find().lean().populate("category").sort({ data: "desc" }).then((posts) => {
         res.render("admin/posts", { posts: posts });
     }).catch((err) => {
@@ -115,7 +116,7 @@ router.get("/posts", (req, res) => {
 });
 
 // add posts
-router.get("/posts/add", (req, res) => {
+router.get("/posts/add", isAdmin, (req, res) => {
     Category.find().lean().then((categories) => {
         res.render("admin/addposts", { categories: categories });
     }).catch((err) => {
@@ -126,7 +127,7 @@ router.get("/posts/add", (req, res) => {
 });
 
 // new post
-router.post("/posts/new", (req, res) => {
+router.post("/posts/new", isAdmin, (req, res) => {
     let error = [];
 
     if (req.body.category === "0") {
@@ -154,7 +155,7 @@ router.post("/posts/new", (req, res) => {
 });
 
 // display posts to edit
-router.get("/posts/edit/:id", (req, res) => {
+router.get("/posts/edit/:id", isAdmin, (req, res) => {
     Post.findOne({ _id: req.params.id }).lean().then((post) => {
         Category.find().lean().then((categories) => {
             res.render("admin/editposts", { categories: categories, post: post });
@@ -171,7 +172,7 @@ router.get("/posts/edit/:id", (req, res) => {
 });
 
 // edit posts
-router.post("/post/edit", (req, res) => {
+router.post("/post/edit", isAdmin, (req, res) => {
     Post.findOne({ _id: req.body.id }).then((post) => {
         //
         post.title = req.body.title;
@@ -196,7 +197,7 @@ router.post("/post/edit", (req, res) => {
 });
 
 // delete post
-router.get("/posts/delete/:id", (req, res) => {
+router.get("/posts/delete/:id", isAdmin, (req, res) => {
     Post.remove({ _id: req.params.id }).then(() => {
         req.flash("success_msg", "Successfully deleted post !")
         res.redirect("/admin/posts");
