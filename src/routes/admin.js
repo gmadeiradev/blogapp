@@ -199,7 +199,7 @@ router.post("/post/edit", isAdmin, (req, res) => {
 // delete post
 router.get("/posts/delete/:id", isAdmin, (req, res) => {
     Post.remove({ _id: req.params.id }).then(() => {
-        req.flash("success_msg", "Successfully deleted post !")
+        req.flash("success_msg", "Successfully deleted post!")
         res.redirect("/admin/posts");
     }).catch((err) => {
         req.flash("error_msg", "There was an internal error!");
